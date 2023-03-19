@@ -1,0 +1,589 @@
+Private Sub Cap2G_AE()
+Dim BSC, BCF, Fecha_I, Hora_I, ID, BTS, FECHAD, FECHAT, Alarma1, Alarma2, FLIBRE, Tipo As Integer
+Dim Linea As String
+Set fso = CreateObject("Scripting.FileSystemObject")
+
+If rips.State = adStateOpen Then
+    rips.Close
+    End If
+If rnom.State = adStateOpen Then
+    rnom.Close
+    End If
+    
+rips.Open "select * from aext", conn, adOpenStatic, adLockOptimistic
+    
+Do Until rips.EOF
+    
+Arch = "C:\ftp1\" & Trim(rips.Fields("archivo"))
+If fso.FileExists(Arch) Then
+        
+FIN = "NO"
+Linea = ""
+FLIBRE = FreeFile()
+    Open ("C:\\ftp1\" & Trim(rips.Fields("archivo"))) For Input As #FLIBRE
+    
+       Do While Not EOF(FLIBRE)
+        Line Input #FLIBRE, Linea
+         If Trim(Mid(Linea, 1, 16) = "COMMAND EXECUTED") Then
+            FIN = "SI"
+         End If
+       Loop
+        Close FLIBRE
+
+If FIN = "SI" Then
+data.Execute "DELETE FROM `ae_nokia` WHERE `BSC` = '" & rips.Fields("BSC") & "';"
+    
+    Open ("C:\\ftp1\" & Trim(rips.Fields("archivo"))) For Input As #FLIBRE
+         
+Line Input #FLIBRE, Linea
+Do While Trim(Mid(Linea, 1, 7)) <> "======="
+Line Input #FLIBRE, Linea
+Loop
+
+Do While Not EOF(FLIBRE)
+            Line Input #FLIBRE, Linea
+
+            If (Mid(Linea, 1, 4) = "BCF-") Then
+            
+            If Mid(Linea, 11, 47) <> "BCF OUTPUTS FOR SRAN ARE NOT CONFIGURED VIA BSC" Then
+            
+            BCF = Trim(Mid(Linea, 5, 4))
+            BSC = rips.Fields("BSC")
+            ID = BSC + BCF
+            If rnom.State = adStateOpen Then
+                                rnom.Close
+                                End If
+                                rnom.Open "select Nombre, Area_Tecnica, idSitios from sitios where idSitios='" & Trim(ID) & "'", node, adOpenStatic, adLockOptimistic
+                                Do Until rnom.EOF
+                                    If Trim(rnom.Fields("idSitios")) = Trim(ID) Then
+                                    otro = rnom.Fields("Nombre")
+                                    AT = rnom.Fields("Area_Tecnica")
+                                    Else
+                                    End If
+                                rnom.MoveNext
+                                Loop
+                                rnom.Close
+                                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT   1"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT   2"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT   3"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT   4"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT   5"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT   6"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT   7"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT   8"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT   9"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  10"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                X1 = "No"
+                X2 = "No"
+                
+                If (ID <> "BSRN180049" And ID <> "BSRN180051" And ID <> "BSRN180077" And ID <> "BSRN180194" And ID <> "BSRN180453" And ID <> "BSRN180575" And ID <> "BSRN180577" And ID <> "BSRN180839" And ID <> "BSRN180841" And ID <> "BSRN181132" And ID <> "BSRN181138" And ID <> "BSRN181143" And ID <> "BSRN181234" And ID <> "BSRN181329" And ID <> "BRNG190465" And ID <> "BCCP200799" And ID <> "BCCP201061" And ID <> "BCCP201062" And ID <> "BPDV150016" And ID <> "BPDV150145" And ID <> "BPDV150241" And ID <> "BPDV150243" And ID <> "BPDV150249" And ID <> "BPDV150251" And ID <> "BPDV150252" And ID <> "BPDV150253" And ID <> "BPDV150254" And ID <> "BPDV150269" And ID <> "BPDV150285" And ID <> "BPDV150347" And ID <> "BPDV150373" And ID <> "BPDV150540" And ID <> "BPDV150598" And ID <> "BPDV150624" And ID <> "BPDV150633") Then
+                X1 = "Si"
+                End If
+                If (ID <> "BPDV150634" And ID <> "BPDV150660" And ID <> "BPDV150776" And ID <> "BPDV150779" And ID <> "BPDV150927" And ID <> "BPDV151003" And ID <> "BPDV151004" And ID <> "BPDV151006" And ID <> "BPDV151177" And ID <> "BPDV151255" And ID <> "BPDV151301" And ID <> "BPDV151388" And ID <> "BMMT160105" And ID <> "BMMT160184" And ID <> "BMMT160241" And ID <> "BMMT160288" And ID <> "BMMT160313" And ID <> "BMMT160618" And ID <> "BMMT160620" And ID <> "BMMT160890" And ID <> "BMMT160920" And ID <> "BMMT161012" And ID <> "BMMT161027" And ID <> "BMMT161158" And ID <> "BMMT161175" And ID <> "BSMT170296" And ID <> "BSMT170555" And ID <> "BSMT170680" And ID <> "BSMT170790" And ID <> "BSMT170804" And ID <> "BSMT171141" And ID <> "BSMT171239" And ID <> "BSMT171455") Then
+                X2 = "Si"
+                End If
+                          
+                If X1 = "Si" And X2 = "Si" Then
+                          
+                          
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  11"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  12"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  13"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  14"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  15"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  16"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  17"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  18"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  19"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  20"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  21"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  22"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  23"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                
+                Do While Trim(Mid(Linea, 1, 10)) <> "INPUT  24"
+                Line Input #FLIBRE, Linea
+                Loop
+                aeinput = Trim(Mid(Linea, 1, 9))
+                aeestado = Trim(Mid(Linea, 32, 10))
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aeid = Trim(Mid(Linea, 49, 3))
+                If aeid <> "-" Then
+                Line Input #FLIBRE, Linea
+                Line Input #FLIBRE, Linea
+                aetexto = Trim(Mid(Linea, 1, 100))
+                Else
+                aetexto = ""
+                End If
+                
+                If aeestado = "ACT" Then
+                    data.Execute "INSERT INTO ae_nokia(BSC,BCF,BSCBCF,INPUT,EST,TEXTO,Sitio,AT) VALUE('" & BSC & "', '" & BCF & "', '" & ID & "', '" & aeinput & "', '" & aeestado & "', '" & aetexto & "', '" & otro & "', '" & AT & "');"
+                End If
+                ID = ""
+                
+            End If
+               
+            End If
+                
+                
+                
+            ID = ""
+            BCF = ""
+             
+            End If
+            
+'ID = ""
+'BCF = ""
+Loop
+
+Close FLIBRE
+
+
+End If
+
+Kill "C:\ftp1\" & Trim(rips.Fields("archivo"))
+'rips.MoveLast
+Else
+rips.MoveNext
+End If
+Loop
+rips.Close
+
+End Sub
